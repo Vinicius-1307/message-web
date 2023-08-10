@@ -1,49 +1,24 @@
 import Button from '@/components/atoms/Button';
 import InputComponent from '@/components/atoms/Input';
 import ModalCreateUser from '@/components/atoms/ModalCreateUser';
+import ModalRestorePassword from '@/components/atoms/ModalRestorePassword';
+import { signIn } from 'next-auth/react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 export default function FormsComponent() {
   const router = useRouter();
-  const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    await axios
-      .post(
-        'http://127.0.0.1:8000/api/login',
-        {
-          name,
-          password,
-        },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-      .then((response) => {
-        alert(response.data.Message);
-        console.log(response.data.data.is_admin);
-        if (!!response.data.data.is_admin) {
-          router.replace('/administrador');
-        } else {
-          router.replace('/mensagens');
-        }
-      })
-      .catch((error) => {
-        if (error.response.data) {
-          alert(error.response.data.Message);
-        }
-        router.reload();
-        console.log(error.response.data);
-      })
-      .finally(() => {
-        setName(null);
-        setPassword(null);
-      });
+    await signIn('credentials', {
+      email: email,
+      password: password,
+      callbackUrl: '/administrador',
+    });
   };
 
   return (
@@ -57,8 +32,8 @@ export default function FormsComponent() {
             </h2>
             <InputComponent
               type="text"
-              placeholder="E-mail ou nome"
-              onChange={(e) => setName(e.target.value)}
+              placeholder="E-mail"
+              onChange={(e) => setEmail(e.target.value)}
             />
             <InputComponent
               type="password"
@@ -66,13 +41,11 @@ export default function FormsComponent() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button color="bg-blue-500">Entrar</Button>
-            <a className="flex justify-center text-blue-500 mt-3 mb-2" href="#">
-              Esqueceu a conta?
-            </a>
-            <div className="h-4 border-b-2 border-gray-300 text-center">
-              <span className="bg-white px-5 text-gray-300">ou</span>
-            </div>
           </form>
+          <ModalRestorePassword />
+          <div className="h-4 border-b-2 border-gray-300 text-center">
+            <span className="bg-white px-5 text-gray-300">ou</span>
+          </div>
           <ModalCreateUser />
         </div>
       </div>

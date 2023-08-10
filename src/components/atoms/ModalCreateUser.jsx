@@ -8,6 +8,7 @@ import axios from 'axios';
 
 export default function ModalCreateUser(props) {
   const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const router = useRouter();
@@ -16,9 +17,10 @@ export default function ModalCreateUser(props) {
     event.preventDefault();
     await axios
       .post(
-        'http://127.0.0.1:8000/api/user',
+        'http://127.0.0.1:8000/api/user/',
         {
           name,
+          email,
           password,
         },
         {
@@ -26,19 +28,20 @@ export default function ModalCreateUser(props) {
         },
       )
       .then((response) => {
-        alert(response.data.Message);
-        router.reload();
+        alert('Conta criada com sucesso.');
+        // router.reload();
         console.log(response.data.Message);
       })
       .catch((error) => {
-        console.log(error.response.data);
-        if (error.response.data) {
-          alert(error.response.data.Message);
+        console.log(error.response.data.message);
+        if (error) {
+          alert(error.response.data.message);
         }
-        router.reload();
+        // router.reload();
       })
       .finally(() => {
         setName(null);
+        setEmail(null);
         setPassword(null);
       });
   };
@@ -67,6 +70,11 @@ export default function ModalCreateUser(props) {
               type="text"
               placeholder="Nome"
               onChange={(e) => setName(e.target.value)}
+            />
+            <InputComponent
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
             />
             <InputComponent
               type="password"
