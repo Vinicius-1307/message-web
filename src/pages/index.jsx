@@ -3,7 +3,6 @@ import InputComponent from '@/components/atoms/Input';
 import ModalCreateUser from '@/components/atoms/ModalCreateUser';
 import ModalRestorePassword from '@/components/atoms/ModalRestorePassword';
 import { signIn } from 'next-auth/react';
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 

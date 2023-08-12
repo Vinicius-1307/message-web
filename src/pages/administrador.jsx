@@ -1,15 +1,55 @@
+import Button from '@/components/atoms/Button';
+import InputComponent from '@/components/atoms/Input';
+import CheckBox from '@/components/atoms/CheckBox';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import ModalCreateMessage from '@/components/atoms/ModalCreateMessage';
+import { useSession } from 'next-auth/react';
 
 export default function Admin() {
-  const [showFormUser, setShowFormUser] = useState(true);
   const [name, setName] = useState(null);
   const [password, setPassword] = useState(null);
-  const [text, setText] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [checked, setChecked] = useState(null);
   const router = useRouter();
-  const [openInicio, setOpenInicio] = useState(null);
+  const { data: session } = useSession();
 
+  // const accessToken = session.data.accessToken;
+
+  const handleCreateUser = async (event) => {
+    event.preventDefault();
+    await axios
+      .post(
+        'http://127.0.0.1:8000/api/user/',
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      )
+      .then((response) => {
+        alert('Conta criada com sucesso.');
+        // router.reload();
+        console.log(handleCreateUser);
+      })
+      .catch((error) => {
+        console.log(error.response.data.message);
+        if (error) {
+          alert(error.response.data.message);
+        }
+        // router.reload();
+      })
+      .finally(() => {
+        setName(null);
+        setEmail(null);
+        setPassword(null);
+      });
+  };
   const handleCreateMessage = async (event) => {
     event.preventDefault();
 
@@ -44,99 +84,41 @@ export default function Admin() {
 
   return (
     <>
-      {showFormUser ? (
-        <div className="flex flex-col justify-center items-center w-full h-screen bg-teal-950  ">
-          <form
-            className="p-8 border border-emerald-400 rounded-sm"
-            onSubmit={(e) => handleCreateUser(e)}
-          >
-            <h1 className="p-8 items-center text-white text-2xl ">
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-200">
+        <h1 className="p-10 text-4xl font-black text-blue-500">
+          Message - ADM
+        </h1>
+        <div className="px-3.5 h-max w-96 bg-white rounded-lg border-solid border-2 border-gray-200 shadow-lg">
+          <form onSubmit={(e) => handleCreateUser(e)}>
+            <h2 className="py-4 flex justify-center text-xl mb-3">
               Cadastrar Usuário
-            </h1>
-
-            <div>
-              <label className="text-white flex flex-col mb-4">
-                {' '}
-                Nome:
-                <input
-                  className="p-2 text-black rounded-lg"
-                  type="text"
-                  name="name"
-                  placeholder="Crie um Nome"
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </label>
+            </h2>
+            <InputComponent
+              type="text"
+              placeholder="Nome"
+              onChange={(e) => setName(e.target.value)}
+            />
+            <InputComponent
+              type="email"
+              placeholder="E-mail"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <InputComponent
+              type="password"
+              placeholder="Senha"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <div className="pt-2 pb-4 flex flex-rows items-center">
+              <CheckBox onChange={(e) => setChecked(e.target.value)} />
+              <span className="ml-2">Admnistrador?</span>
             </div>
-
-            <div className="">
-              <label className="text-white flex flex-col">
-                Senha:
-                <input
-                  className="p-2 text-black rounded-lg"
-                  type="password"
-                  name="password"
-                  placeholder="Crie uma Senha"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div>
-              <button className="p-2 bg-emerald-400 rounded-lg mt-8 hover:bg-emerald-500 w-full ">
-                Cadastrar
-              </button>
+            <div className="mb-4">
+              <Button color="bg-blue-500">Cadastrar</Button>
             </div>
           </form>
-
-          <div>
-            <button
-              className="p-2 bg-emerald-400 rounded-lg mt-4 hover:bg-emerald-500 w-full"
-              onClick={() => setShowFormUser(false)}
-            >
-              Criar Mensagem
-            </button>
-          </div>
         </div>
-      ) : (
-        <div className="flex flex-col justify-center items-center w-full h-screen bg-teal-950  ">
-          <form
-            className="p-8 border border-emerald-400 rounded-sm"
-            onSubmit={(e) => handleCreateMessage(e)}
-          >
-            <h1 className="p-8 items-center text-white text-2xl ">
-              Enviar uma Mensagem
-            </h1>
-
-            <div>
-              <label className="text-white flex flex-col">
-                {' '}
-                Escreva sua Mensagem:
-                <textarea
-                  className="text-black mt-4 rounded-sm"
-                  cols="30"
-                  rows="10"
-                  onChange={(e) => setText(e.target.value)}
-                ></textarea>
-              </label>
-            </div>
-
-            <div>
-              <button className="p-2 bg-emerald-400 rounded-lg mt-8 hover:bg-emerald-500 w-full">
-                Enviar
-              </button>
-            </div>
-          </form>
-
-          <div>
-            <button
-              className="p-2 bg-emerald-400 rounded-lg mt-4 hover:bg-emerald-500 w-full"
-              onClick={() => setShowFormUser(true)}
-            >
-              Cadastrar Usuário
-            </button>
-          </div>
-        </div>
-      )}
+        <ModalCreateMessage />
+      </div>
     </>
   );
 }
