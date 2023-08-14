@@ -18,7 +18,9 @@ export default function ModalCreateMessage() {
     if (session) {
       axios
         .get('http://127.0.0.1:8000/api/user/', {
-          Authorization: `Bearer ${session.accessToken}`,
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
         })
         .then((response) => {
           console.log(response.data);
