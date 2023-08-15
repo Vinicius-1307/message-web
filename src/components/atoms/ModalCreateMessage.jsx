@@ -10,7 +10,7 @@ import { useSession } from 'next-auth/react';
 export default function ModalCreateMessage() {
   const [text, setText] = useState(null);
   const [modalShow, setModalShow] = useState(false);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // Inicializando users como array vazio
   const [selectedUserId, setSelectedUserId] = useState('');
   const { data: session } = useSession();
 
@@ -24,7 +24,7 @@ export default function ModalCreateMessage() {
         })
         .then((response) => {
           console.log(response.data);
-          setUsers(response.data);
+          setUsers(response.data.users);
         })
         .catch((error) => {
           console.error('Erro ao obter a lista de usuários:', error);
@@ -32,9 +32,44 @@ export default function ModalCreateMessage() {
     }
   }, [session]);
 
+  const handleCreateMessage = async (event) => {
+    event.preventDefault();
+    await axios
+      .post(
+        'http://127.0.0.1:8000/api/messages',
+        {
+          title,
+          content,
+          usersId,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      )
+      .then((response) => {
+        alert('Conta criada com sucesso.');
+        // router.reload();
+        console.log(handleCreateUser);
+      })
+      .catch((error) => {
+        console.log(error.response.data.message);
+        if (error) {
+          alert(error.response.data.message);
+        }
+        // router.reload();
+      })
+      .finally(() => {
+        setName(null);
+        setEmail(null);
+        setPassword(null);
+      });
+  };
+
   const handleUserChange = (event) => {
     setSelectedUserId(event.target.value);
   };
+
   return (
     <>
       <div className=" mx-20 mb-4 mt-6">
@@ -51,7 +86,7 @@ export default function ModalCreateMessage() {
         <Modal.Body>
           <form
             className="px-3.5 h-max rounded-sm"
-            onSubmit={(e) => handleCreateUser(e)}
+            onSubmit={(e) => handleCreateMessage(e)}
           >
             <h2 className="py-2 flex justify-center text-xl">Mensagens</h2>
             <hr className="mb-4" />

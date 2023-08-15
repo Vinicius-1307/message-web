@@ -15,8 +15,6 @@ export default function Admin() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  // const accessToken = session.data.accessToken;
-
   const handleCreateUser = async (event) => {
     event.preventDefault();
     await axios
