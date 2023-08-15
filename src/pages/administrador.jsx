@@ -8,10 +8,10 @@ import ModalCreateMessage from '@/components/atoms/ModalCreateMessage';
 import { useSession } from 'next-auth/react';
 
 export default function Admin() {
-  const [name, setName] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [checked, setChecked] = useState(null);
+  const [name, setName] = useState();
+  const [password, setPassword] = useState();
+  const [email, setEmail] = useState();
+  const [checked, setChecked] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -24,15 +24,17 @@ export default function Admin() {
           name,
           email,
           password,
+          is_admin: checked,
         },
         {
-          headers: { 'Content-Type': 'application/json' },
-          Authorization: `Bearer ${session.accessToken}`,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.accessToken}`,
+          },
         },
       )
       .then((response) => {
         alert('Conta criada com sucesso.');
-        // router.reload();
         console.log(handleCreateUser);
       })
       .catch((error) => {
@@ -40,12 +42,6 @@ export default function Admin() {
         if (error) {
           alert(error.response.data.message);
         }
-        // router.reload();
-      })
-      .finally(() => {
-        setName(null);
-        setEmail(null);
-        setPassword(null);
       });
   };
   const handleCreateMessage = async (event) => {
@@ -107,7 +103,7 @@ export default function Admin() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <div className="pt-2 pb-4 flex flex-rows items-center">
-              <CheckBox onChange={(e) => setChecked(e.target.value)} />
+              <CheckBox onChange={(e) => setChecked(e.target.checked)} />
               <span className="ml-2">Admnistrador?</span>
             </div>
             <div className="mb-4">
