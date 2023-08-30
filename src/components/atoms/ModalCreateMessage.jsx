@@ -6,11 +6,13 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import makeAnimated from 'react-select/animated';
 import { useSession } from 'next-auth/react';
+import InputComponent from './Input';
 
 export default function ModalCreateMessage() {
   const [text, setText] = useState(null);
   const [modalShow, setModalShow] = useState(false);
-  const [users, setUsers] = useState([]); // Inicializando users como array vazio
+  const [users, setUsers] = useState([]);
+  const [title, setTitle] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
   const { data: session } = useSession();
 
@@ -39,7 +41,7 @@ export default function ModalCreateMessage() {
         'http://127.0.0.1:8000/api/messages',
         {
           title,
-          content,
+          content: text,
           usersId,
         },
         {
@@ -103,6 +105,10 @@ export default function ModalCreateMessage() {
               </Form.Group>
             </div>
             <div>
+              <label className="flex flex-col">
+                Escreva seu título:
+                <input type="text" className="border-2 rounded-lg p-1 mb-2" />
+              </label>
               <label className="flex flex-col">
                 Escreva sua Mensagem:
                 <textarea

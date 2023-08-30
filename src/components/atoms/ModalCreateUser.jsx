@@ -29,7 +29,7 @@ export default function ModalCreateUser(props) {
       )
       .then((response) => {
         alert('Conta criada com sucesso.');
-        // router.reload();
+        router.reload();
         console.log(response.data.Message);
       })
       .catch((error) => {
@@ -37,7 +37,7 @@ export default function ModalCreateUser(props) {
         if (error) {
           alert(error.response.data.message);
         }
-        // router.reload();
+        router.reload();
       })
       .finally(() => {
         setName(null);
