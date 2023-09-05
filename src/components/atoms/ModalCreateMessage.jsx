@@ -43,7 +43,7 @@ export default function ModalCreateMessage() {
         {
           title,
           content: text,
-          users: selectedUserId.map((user) => user.id),
+          users: usersValue,
         },
         {
           headers: {
@@ -53,20 +53,20 @@ export default function ModalCreateMessage() {
         },
       )
       .then((response) => {
-        sweetAlert('Mensagem enviada com sucesso!');
+        alert(response.data.message);
         router.reload();
       })
       .catch((error) => {
         if (error) {
-          alert(error.response.data.message);
+          alert(error.data.message);
         }
         router.reload();
       });
   };
 
-  const handleUserChange = (event) => {
-    setSelectedUserId(event.target.value);
-  };
+  const usersValue = selectedUserId.map(
+    (selectedUserId) => selectedUserId.value,
+  );
 
   return (
     <>
@@ -91,12 +91,18 @@ export default function ModalCreateMessage() {
             <div className="mb-4">
               <Select
                 isMulti
+                options={[
+                  { value: '', label: 'Todos os usuários' },
+                  ...users.map((user) => ({
+                    value: user.id,
+                    label: user.name,
+                  })),
+                ]}
                 value={selectedUserId}
                 onChange={(selectedOptions) =>
                   setSelectedUserId(selectedOptions)
                 }
               />
-              {console.log(selectedUserId)}
             </div>
             <div>
               <label
