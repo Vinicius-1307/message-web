@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 export default function FormsComponent() {
-  const router = useRouter();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 

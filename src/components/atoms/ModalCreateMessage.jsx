@@ -4,17 +4,18 @@ import Button from './Button';
 import axios from 'axios';
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import makeAnimated from 'react-select/animated';
 import { useSession } from 'next-auth/react';
-import InputComponent from './Input';
+import { useRouter } from 'next/router';
+import Select from 'react-select';
 
 export default function ModalCreateMessage() {
   const [text, setText] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [title, setTitle] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState([]);
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     if (session) {
@@ -42,29 +43,24 @@ export default function ModalCreateMessage() {
         {
           title,
           content: text,
-          usersId,
+          users: selectedUserId.map((user) => user.id),
         },
         {
-          headers: { 'Content-Type': 'application/json' },
-          Authorization: `Bearer ${session.accessToken}`,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.accessToken}`,
+          },
         },
       )
       .then((response) => {
-        alert('Conta criada com sucesso.');
-        // router.reload();
-        console.log(handleCreateUser);
+        sweetAlert('Mensagem enviada com sucesso!');
+        router.reload();
       })
       .catch((error) => {
-        console.log(error.response.data.message);
         if (error) {
           alert(error.response.data.message);
         }
-        // router.reload();
-      })
-      .finally(() => {
-        setName(null);
-        setEmail(null);
-        setPassword(null);
+        router.reload();
       });
   };
 
@@ -93,19 +89,20 @@ export default function ModalCreateMessage() {
             <h2 className="py-2 flex justify-center text-xl">Mensagens</h2>
             <hr className="mb-4" />
             <div className="mb-4">
-              <Form.Group>
-                <Form.Select value={selectedUserId} onChange={handleUserChange}>
-                  <option value="">Todos os usuários</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+              <Select
+                isMulti
+                value={selectedUserId}
+                onChange={(selectedOptions) =>
+                  setSelectedUserId(selectedOptions)
+                }
+              />
+              {console.log(selectedUserId)}
             </div>
             <div>
-              <label className="flex flex-col">
+              <label
+                className="flex flex-col"
+                onChange={(e) => setTitle(e.target.value)}
+              >
                 Escreva seu título:
                 <input type="text" className="border-2 rounded-lg p-1 mb-2" />
               </label>
