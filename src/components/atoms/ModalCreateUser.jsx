@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 
 import Modal from 'react-bootstrap/Modal';
 import InputComponent from './Input';
@@ -11,6 +12,7 @@ export default function ModalCreateUser(props) {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [modalShow, setModalShow] = useState(false);
+  const { data: session } = useSession();
   const router = useRouter();
 
   const handleCreateUser = async (event) => {
@@ -24,25 +26,21 @@ export default function ModalCreateUser(props) {
           password,
         },
         {
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.accessToken}`,
+          },
         },
       )
       .then((response) => {
-        alert('Conta criada com sucesso.');
+        sweetAlert('Conta criada com sucesso.');
         router.reload();
-        console.log(response.data.Message);
       })
       .catch((error) => {
-        console.log(error.response.data.message);
         if (error) {
-          alert(error.response.data.message);
+          sweetAlert(error.response.data.message);
         }
         router.reload();
-      })
-      .finally(() => {
-        setName(null);
-        setEmail(null);
-        setPassword(null);
       });
   };
   return (
