@@ -33,12 +33,12 @@ export default function ModalCreateUser(props) {
         },
       )
       .then((response) => {
-        sweetAlert('Conta criada com sucesso.');
+        alert('Conta criada com sucesso.');
         router.reload();
       })
       .catch((error) => {
         if (error) {
-          sweetAlert(error.response.data.message);
+          alert(error.response.data.message);
         }
         router.reload();
       });

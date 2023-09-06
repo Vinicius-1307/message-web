@@ -10,13 +10,19 @@ export default function FormsComponent() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
+  const router = useRouter();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signIn('credentials', {
+    const response = await signIn('credentials', {
       email: email,
       password: password,
       callbackUrl: '/administrador',
     });
+    if (response?.user?.isAdmin) {
+      router.push('/administrador');
+    }
+    router.push('/usuario');
   };
 
   return (
