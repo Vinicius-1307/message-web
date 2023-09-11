@@ -35,44 +35,11 @@ export default function Admin() {
       )
       .then((response) => {
         alert('Conta criada com sucesso.');
-        console.log(handleCreateUser);
+        router.reload();
       })
       .catch((error) => {
-        console.log(error.response.data.message);
-        if (error) {
-          alert(error.response.data.message);
-        }
-      });
-  };
-  const handleCreateMessage = async (event) => {
-    event.preventDefault();
-
-    await axios
-      .post(
-        'http://127.0.0.1:8000/api/message',
-        {
-          text,
-          is_read: false,
-        },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-      .then((response) => {
-        alert(response.data.Message);
+        alert(error.response.data.message);
         router.reload();
-        console.log(response.data.Message);
-      })
-      .catch((error) => {
-        if (error.response.data) {
-          alert(error.response.data.Message);
-        }
-        router.reload();
-        console.log(error.response.data);
-      })
-      .finally(() => {
-        setName(null);
-        setPassword(null);
       });
   };
 
