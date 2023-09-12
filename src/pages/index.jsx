@@ -9,20 +9,18 @@ import { useState } from 'react';
 export default function FormsComponent() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const router = useRouter();
-
-  const handleSubmit = async (e) => {
+  const Login = (e) => {
     e.preventDefault();
-    const response = await signIn('credentials', {
-      email: email,
-      password: password,
-      callbackUrl: '/administrador',
+    setIsLoading(true);
+
+    signIn('credentials', {
+      email,
+      password,
+      callbackUrl: '/',
     });
-    if (response?.user?.isAdmin) {
-      router.push('/administrador');
-    }
-    router.push('/usuario');
+    setIsLoading(false);
   };
 
   return (
@@ -30,7 +28,7 @@ export default function FormsComponent() {
       <div className="flex flex-col justify-center items-center h-screen bg-gray-200">
         <h1 className="p-10 text-4xl font-black text-blue-500">Message</h1>
         <div className="px-3.5 h-max w-96 bg-white rounded-lg border-solid border-2 border-gray-200 shadow-lg">
-          <form onSubmit={(e) => handleSubmit(e)}>
+          <form onSubmit={(e) => Login(e)}>
             <h2 className="py-4 flex justify-center text-xl mb-3">
               Entrar no Message
             </h2>
