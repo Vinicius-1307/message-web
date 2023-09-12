@@ -30,7 +30,7 @@ export default function ModalCreateMessage() {
           setUsers(response.data.users);
         })
         .catch((error) => {
-          console.error('Erro ao obter a lista de usuários:', error);
+          console.error('Erro ao obter a lista de usuários.', error);
         });
     }
   }, [session]);
