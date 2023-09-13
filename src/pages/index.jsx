@@ -17,7 +17,7 @@ export default function FormsComponent() {
     signIn('credentials', {
       email,
       password,
-      callbackUrl: '/',
+      callbackUrl: '/api/isAdmin',
     });
     setIsLoading(false);
   };

@@ -1,8 +1,11 @@
-export default function handler(req, res) {
-  const { data: session } = useSession();
-  const router = useRouter();
+import { getSession } from 'next-auth/react';
+
+export default async function handler(req, res) {
+  const session = await getSession(req);
 
   session.user.is_admin
-    ? router.push("/adiministrador")
-    : router.push("/usuario");
+    ? res.redirect(300, '/adiministrador')
+    : res.redirect(300, '/usuario');
+
+  return;
 }
