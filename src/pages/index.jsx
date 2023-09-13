@@ -2,10 +2,7 @@ import Button from '@/components/atoms/Button';
 import InputComponent from '@/components/atoms/Input';
 import ModalCreateUser from '@/components/atoms/ModalCreateUser';
 import ModalRestorePassword from '@/components/atoms/ModalRestorePassword';
-import { useGlobalContext } from '@/hooks/useGlobal';
 import { signIn } from 'next-auth/react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 export default function FormsComponent() {
