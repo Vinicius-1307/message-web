@@ -47,7 +47,7 @@ export default function Admin() {
     <>
       <div className="flex flex-col justify-center items-center h-screen bg-gray-200">
         <h1 className="p-10 text-4xl font-black text-blue-500">
-          Message - {session.user.name}
+          Message - {session?.user.name}
         </h1>
         <div className="px-3.5 h-max w-96 bg-white rounded-lg border-solid border-2 border-gray-200 shadow-lg">
           <form onSubmit={(e) => handleCreateUser(e)}>

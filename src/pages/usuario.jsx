@@ -33,7 +33,7 @@ export default function User() {
     <>
       <div className="flex flex-col justify-center items-center h-screen bg-gray-200">
         <h1 className="p-10 text-4xl font-black text-blue-500">
-          Message - {session.user.name}
+          Message - {session?.user.name}
         </h1>
         <div className="px-3.5 h-max w-96 bg-white rounded-lg border-solid border-2 border-gray-200 shadow-lg">
           <h2 className="py-4 flex justify-center text-xl mb-3">Mensagens</h2>
