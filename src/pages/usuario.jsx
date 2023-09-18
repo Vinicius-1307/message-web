@@ -15,22 +15,23 @@ export default function User() {
   useEffect(() => {
     if (session) {
       axios
-        .get('http://127.0.0.1:8000/api/messages/', {
+        .get('http://127.0.0.1:8000/api/list-messages/', {
           headers: {
             Authorization: `Bearer ${session.accessToken}`,
           },
         })
         .then((response) => {
-          setMessages(response.data.data);
+          setMessages(response.data.data.messages);
         })
         .catch((error) => {
-          console.error('Erro ao obter a lista de usuários:', error);
+          console.error('Erro ao obter a lista de mensagens.', error);
         });
     }
   }, [session]);
 
   return (
     <>
+      {console.log(messages)}
       <div className="flex flex-col justify-center items-center h-screen bg-gray-200">
         <h1 className="p-10 text-4xl font-black text-blue-500">
           Message - {session?.user.name}
