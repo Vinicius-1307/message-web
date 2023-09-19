@@ -7,6 +7,7 @@ import Button from '@/components/atoms/Button';
 export default function User() {
   const [messages, setMessages] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [messageIds, setMessageIds] = useState([]);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -29,6 +30,11 @@ export default function User() {
 
   const handleCheckedMessage = async (event) => {
     event.preventDefault();
+    const messageId = messageIds[0];
+    if (!messageId) {
+      alert('Nenhum ID de mensagem selecionado.');
+      return;
+    }
     await axios
       .patch('http://127.0.0.1:8000/api/messages/${messsage.id}', {
         headers: {
@@ -42,11 +48,19 @@ export default function User() {
       })
       .catch((error) => {
         if (error) {
-          alert(error.data.message);
+          alert(error.data);
         }
         router.reload();
       });
   };
+
+  function handleCheckBox({ id, isRemoved = false }) {
+    if (!isRemoved) {
+      const newArray = [...messageIds, id];
+      setMessageIds(newArray);
+      return;
+    }
+  }
 
   return (
     <>
@@ -59,16 +73,19 @@ export default function User() {
           <div>
             {messages && messages.length > 0 ? (
               messages.map((message, index) => (
-                <li
-                  key={index}
-                  className="flex flex-col list-none text-left border-b-2 mb-2"
-                >
-                  <label>
-                    <input type="checkbox" checked={checked[message.id]} />{' '}
-                    <br />
-                    <span>Título: {message.title}</span> <br />
-                    <span>Conteúdo: {message.content}</span>
+                <li key={index} className="list-none text-left border-b-2 mb-2">
+                  <label className="flex flex-col relative">
+                    <div className="flex flex-col">
+                      <span>Título: {message.title}</span>
+                      <span>Conteúdo: {message.content}</span>
+                    </div>
+                    <input
+                      className="absolute right-4 top-4"
+                      type="checkbox"
+                      onChange={() => handleCheckBox({ id: message.id })}
+                    />{' '}
                   </label>
+                  {console.log(handleCheckBox)}
                 </li>
               ))
             ) : (
@@ -79,7 +96,7 @@ export default function User() {
           </div>
           <Button
             color="bg-blue-500"
-            onClick={() => handleCheckedMessage(message.id)}
+            onClick={(event) => handleCheckedMessage(event, messages)}
           >
             Marcar como lida
           </Button>
@@ -88,3 +105,26 @@ export default function User() {
     </>
   );
 }
+// export async function getServerSideProps(ctx) {
+//   try {
+//     const messages = await api.get(`http://127.0.0.1:8000/api/list-messages/`);
+
+//     return {
+//       props: {
+//         messages: messages,
+//       },
+//     };
+//   } catch (error) {
+//     if (error.response) {
+//       console.log('error', error);
+//     }
+//     return {
+//       redirect: {
+//         destination: `/${
+//           error.response ? '?error=' + error.response.data.message : ''
+//         }`,
+//       },
+//       props: {},
+//     };
+//   }
+// }
