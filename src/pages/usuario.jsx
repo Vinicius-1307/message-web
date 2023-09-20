@@ -1,40 +1,26 @@
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import Button from '@/components/atoms/Button';
 
-export default function User() {
-  const [messages, setMessages] = useState([]);
+export default function User({ GetAllMessages }) {
   const [messageIds, setMessageIds] = useState([]);
   const router = useRouter();
   const { data: session } = useSession();
 
-  useEffect(() => {
-    if (session) {
-      axios
-        .get('http://127.0.0.1:8000/api/list-messages/', {
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-        })
-        .then((response) => {
-          setMessages(response.data.data.messages);
-        })
-        .catch((error) => {
-          console.error('Erro ao obter a lista de mensagens.', error);
-        });
-    }
-  }, [session]);
-
   const handleCheckedMessage = async (event) => {
     event.preventDefault();
     await axios
-      .patch('http://127.0.0.1:8000/api/messages/${message_id}', {
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+      .patch(
+        `http://127.0.0.1:8000/api/read/${messageIds}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
         },
-      })
+      )
       .then((response) => {
         alert(response.data.message);
         router.reload();
@@ -64,40 +50,45 @@ export default function User() {
         <div className="px-3.5 h-max w-96 bg-white rounded-lg border-solid border-2 border-gray-200 shadow-lg">
           <h2 className="py-4 flex justify-center text-xl mb-3">Mensagens</h2>
           <div>
-            {messages && messages.length > 0 ? (
-              messages.map((message, index) => (
-                <li key={index} className="list-none text-left border-b-2 mb-2">
-                  <label className="flex flex-col relative">
-                    <div className="flex flex-col">
-                      <span>Título: {message.title}</span>
-                      <span>Conteúdo: {message.content}</span>
-                    </div>
-                    <input
-                      className="absolute right-4 top-4"
-                      type="checkbox"
-                      onClick={(e) => {
-                        console.log(handleCheckBox);
-                        if (e.target.checked) {
-                          handleCheckBox({ id: message.id });
-                        } else {
-                          handleCheckBox({ id: message.id, isRemoved: true });
-                        }
-                      }}
-                      checked={message.isSelected}
-                    />
-                  </label>
-                </li>
-              ))
+            {GetAllMessages && GetAllMessages.readed !== 1 ? (
+              GetAllMessages.filter((message) => message.readed !== 1).map(
+                (message, index) => (
+                  <li
+                    key={index}
+                    className="list-none text-left border-b-2 mb-2"
+                  >
+                    <label className="flex flex-col relative">
+                      <div className="flex flex-col">
+                        <span>Título: {message.title}</span>
+                        <span>Conteúdo: {message.content}</span>
+                      </div>
+                      <input
+                        className="absolute right-4 top-4"
+                        type="checkbox"
+                        onClick={(e) => {
+                          if (e.target.checked) {
+                            handleCheckBox({ id: message.id });
+                          } else {
+                            handleCheckBox({ id: message.id, isRemoved: true });
+                          }
+                        }}
+                        checked={message.isSelected}
+                      />
+                    </label>
+                  </li>
+                ),
+              )
             ) : (
               <p className="text-lg text-blue-500 text-center">
-                Não há nenhuma mensagem para você!
+                Não há nenhuma mensagem para você, ou já foram marcadas como
+                lidas!
               </p>
             )}
           </div>
           <div className="flex justify-center">
             <button
               className="bg-blue-500 w-40 h-12 text-white rounded-lg mb-2"
-              onClick={(event) => handleCheckedMessage(event, messages)}
+              onClick={(event) => handleCheckedMessage(event)}
             >
               Marcar como lida
             </button>
@@ -107,26 +98,28 @@ export default function User() {
     </>
   );
 }
-// export async function getServerSideProps(ctx) {
-//   try {
-//     const messages = await api.get(`http://127.0.0.1:8000/api/list-messages/`);
-
-//     return {
-//       props: {
-//         messages: messages,
-//       },
-//     };
-//   } catch (error) {
-//     if (error.response) {
-//       console.log('error', error);
-//     }
-//     return {
-//       redirect: {
-//         destination: `/${
-//           error.response ? '?error=' + error.response.data.message : ''
-//         }`,
-//       },
-//       props: {},
-//     };
-//   }
-// }
+export async function getServerSideProps(ctx) {
+  const session = await getSession(ctx);
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:8000/api/list-messages/`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      },
+    );
+    return {
+      props: {
+        GetAllMessages: response.data.data.messages,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {},
+    };
+    if (error.response) {
+      console.log('error', error);
+    }
+  }
+}
