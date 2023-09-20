@@ -6,7 +6,6 @@ import Button from '@/components/atoms/Button';
 
 export default function User() {
   const [messages, setMessages] = useState([]);
-  const [checked, setChecked] = useState(false);
   const [messageIds, setMessageIds] = useState([]);
   const router = useRouter();
   const { data: session } = useSession();
@@ -30,15 +29,9 @@ export default function User() {
 
   const handleCheckedMessage = async (event) => {
     event.preventDefault();
-    const messageId = messageIds[0];
-    if (!messageId) {
-      alert('Nenhum ID de mensagem selecionado.');
-      return;
-    }
     await axios
-      .patch('http://127.0.0.1:8000/api/messages/${messsage.id}', {
+      .patch('http://127.0.0.1:8000/api/messages/${message_id}', {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${session.accessToken}`,
         },
       })
@@ -82,10 +75,17 @@ export default function User() {
                     <input
                       className="absolute right-4 top-4"
                       type="checkbox"
-                      onChange={() => handleCheckBox({ id: message.id })}
-                    />{' '}
+                      onClick={(e) => {
+                        console.log(handleCheckBox);
+                        if (e.target.checked) {
+                          handleCheckBox({ id: message.id });
+                        } else {
+                          handleCheckBox({ id: message.id, isRemoved: true });
+                        }
+                      }}
+                      checked={message.isSelected}
+                    />
                   </label>
-                  {console.log(handleCheckBox)}
                 </li>
               ))
             ) : (
@@ -94,12 +94,14 @@ export default function User() {
               </p>
             )}
           </div>
-          <Button
-            color="bg-blue-500"
-            onClick={(event) => handleCheckedMessage(event, messages)}
-          >
-            Marcar como lida
-          </Button>
+          <div className="flex justify-center">
+            <button
+              className="bg-blue-500 w-40 h-12 text-white rounded-lg mb-2"
+              onClick={(event) => handleCheckedMessage(event, messages)}
+            >
+              Marcar como lida
+            </button>
+          </div>
         </div>
       </div>
     </>
